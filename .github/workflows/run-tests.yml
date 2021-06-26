@@ -1,0 +1,58 @@
+name: run-tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [8, 7.4]
+
+    name: PHP ${{ matrix.php }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.composer/cache/files
+          key: dependencies-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            dependencies-php-${{ matrix.php }}-composer-
+            dependencies-php-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: libxml
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction
+
+      - name: Execute tests
+        run: composer test
+
+      - name: Upload coverage
+        env:
+          COVERAGE_KEY: ${{ secrets.COVERAGE_KEY }}
+          COVERAGE_HOST: ${{ secrets.COVERAGE_HOST }}
+        run: |
+          RESPONSE=$(curl -sS -w '%{http_code}' -X POST -F "file=@coverage.clover" -H "Authorization: Bearer $COVERAGE_KEY" "$COVERAGE_HOST/$GITHUB_REPOSITORY/${GITHUB_REF#refs/heads/}")
+          if [[ "$RESPONSE" = 204 ]]; then
+              echo "Great Success"
+          else
+              echo "ERROR: server returned $RESPONSE"
+              exit 1
+          fi
