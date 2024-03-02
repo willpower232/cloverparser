@@ -26,11 +26,18 @@ class CloverParser
             throw new \RuntimeException('Clover file is not present');
         }
 
+        set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+            throw new \Exception($errstr, $errno);
+        });
+
         try {
             $this->xmlInstances[] = new SimpleXMLElement($pathToFile, 0, true);
         } catch (\Exception $e) {
+            restore_error_handler();
             throw new \RuntimeException('Unable to process Clover file', 0, $e);
         }
+
+        restore_error_handler();
 
         $this->files[] = $pathToFile;
 
