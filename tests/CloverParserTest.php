@@ -8,10 +8,7 @@ use WillPower232\CloverParser\CloverParser;
 
 class CloverParserTest extends TestCase
 {
-    /**
-     * @return array<mixed>
-     */
-    private function makeTempFileSafely(): array
+    private function makeTempFileSafely(): string
     {
         $file = tmpfile();
 
@@ -21,10 +18,7 @@ class CloverParserTest extends TestCase
 
         $path = stream_get_meta_data($file)['uri'];
 
-        return [
-            $file,
-            $path,
-        ];
+        return $path;
     }
 
     public function testNoFile(): void
@@ -43,8 +37,9 @@ class CloverParserTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unable to process Clover file');
+        $path = $this->makeTempFileSafely();
 
-        [$file, $path] = $this->makeTempFileSafely();
+        file_put_contents($path, 'not xml');
 
         $parser->addFile($path);
     }
@@ -64,8 +59,6 @@ class CloverParserTest extends TestCase
     {
         $parser = new CloverParser();
 
-        [$file, $path] = $this->makeTempFileSafely();
-
         $clover = <<<ENDCLOVER
         <?xml version="1.0" encoding="UTF-8"?>
         <coverage generated="1618905787">
@@ -77,7 +70,9 @@ class CloverParserTest extends TestCase
         </coverage>
         ENDCLOVER;
 
-        fwrite($file, $clover);
+        $path = $this->makeTempFileSafely();
+
+        file_put_contents($path, $clover);
 
         $parser->addFile($path);
 
@@ -87,8 +82,6 @@ class CloverParserTest extends TestCase
     public function testCalculationFromFiles(): void
     {
         $parser = new CloverParser();
-
-        [$file, $path] = $this->makeTempFileSafely();
 
         $clover = <<<ENDCLOVER
         <?xml version="1.0" encoding="UTF-8"?>
@@ -115,7 +108,9 @@ class CloverParserTest extends TestCase
         </coverage>
         ENDCLOVER;
 
-        fwrite($file, $clover);
+        $path = $this->makeTempFileSafely();
+
+        file_put_contents($path, $clover);
 
         $parser->addFile($path);
 
@@ -125,8 +120,6 @@ class CloverParserTest extends TestCase
     public function testCalculationAvoidsDivisionByZero(): void
     {
         $parser = new CloverParser();
-
-        [$file, $path] = $this->makeTempFileSafely();
 
         $clover = <<<ENDCLOVER
         <?xml version="1.0" encoding="UTF-8"?>
@@ -139,7 +132,9 @@ class CloverParserTest extends TestCase
         </coverage>
         ENDCLOVER;
 
-        fwrite($file, $clover);
+        $path = $this->makeTempFileSafely();
+
+        file_put_contents($path, $clover);
 
         $parser->addFile($path);
 
