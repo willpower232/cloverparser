@@ -52,14 +52,12 @@ class CloverParser
             'methods' => 0,
             'conditionals' => 0,
             'statements' => 0,
-            'elements' => 0,
         ];
 
         $this->coveredTotals = [
             'coveredmethods' => 0,
             'coveredconditionals' => 0,
             'coveredstatements' => 0,
-            'coveredelements' => 0,
         ];
 
         $this->hasCalculatedTotals = false;
@@ -105,8 +103,6 @@ class CloverParser
         $this->coveredTotals['coveredconditionals'] += (int) $metrics['coveredconditionals'];
         $this->totals['statements'] += (int) $metrics['statements'];
         $this->coveredTotals['coveredstatements'] += (int) $metrics['coveredstatements'];
-        $this->totals['elements'] += (int) $metrics['elements'];
-        $this->coveredTotals['coveredelements'] += (int) $metrics['coveredelements'];
     }
 
     public function getPercentage(): float

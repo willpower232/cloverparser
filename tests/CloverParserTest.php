@@ -114,7 +114,7 @@ class CloverParserTest extends TestCase
 
         $parser->addFile($path);
 
-        $this->assertSame(20.51282051282051, $parser->getPercentage());
+        $this->assertSame(23.809523809523807, $parser->getPercentage());
     }
 
     public function testCalculationAvoidsDivisionByZero(): void
