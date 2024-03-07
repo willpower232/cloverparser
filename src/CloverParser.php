@@ -75,13 +75,6 @@ class CloverParser
 
                     continue;
                 }
-
-                foreach ($project->xpath('//file') as $file) {
-                    // no other way of seeing if the element exists?
-                    if ($file->metrics->count() > 0) {
-                        $this->incrementTotalsWithMetrics($file->metrics);
-                    }
-                }
             }
         }
 
