@@ -4,6 +4,16 @@ namespace WillPower232\CloverParser;
 
 use SimpleXMLElement;
 
+/**
+ * Calculation reference https://confluence.atlassian.com/pages/viewpage.action?pageId=79986990
+ * So in order to calculate the Total Percentage Coverage metric using data from an XML report
+ * you have to use the following equation:
+ *
+ * TPC = (coveredconditionals + coveredstatements + coveredmethods) / (conditionals + statements + methods)
+ *
+ * Using elements is incorrect as according to that page notes, "elements" is conditionals + statements,
+ * which means including them in the calculation would double-count statements.
+ */
 class CloverParser
 {
     /** @var array<string> */
