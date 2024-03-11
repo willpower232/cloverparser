@@ -79,10 +79,11 @@ class CloverParserTest extends TestCase
         $this->assertSame(77.54237288135593, $parser->getPercentage());
     }
 
-    public function testCalculationFromFiles(): void
+    public function testCalculationMissingProjectMetrics(): void
     {
         $parser = new CloverParser();
 
+        // This is not a realistic file; clover metrics should always have top-level project metrics
         $clover = <<<ENDCLOVER
         <?xml version="1.0" encoding="UTF-8"?>
         <coverage generated="1618905787">
@@ -114,7 +115,7 @@ class CloverParserTest extends TestCase
 
         $parser->addFile($path);
 
-        $this->assertSame(20.51282051282051, $parser->getPercentage());
+        $this->assertSame(0.0, $parser->getPercentage());
     }
 
     public function testCalculationAvoidsDivisionByZero(): void

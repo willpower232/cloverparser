@@ -45,6 +45,7 @@ jobs:
         run: composer test
 
       - name: Upload coverage
+        if: github.ref == 'refs/heads/main'
         env:
           COVERAGE_KEY: ${{ secrets.COVERAGE_KEY }}
           COVERAGE_HOST: ${{ secrets.COVERAGE_HOST }}

@@ -4,6 +4,16 @@ namespace WillPower232\CloverParser;
 
 use SimpleXMLElement;
 
+/**
+ * Calculation reference https://confluence.atlassian.com/pages/viewpage.action?pageId=79986990
+ * So in order to calculate the Total Percentage Coverage metric using data from an XML report
+ * you have to use the following equation:
+ *
+ * TPC = (coveredconditionals + coveredstatements + coveredmethods) / (conditionals + statements + methods)
+ *
+ * Using elements is incorrect as according to that page notes, "elements" is conditionals + statements,
+ * which means including them in the calculation would double-count statements.
+ */
 class CloverParser
 {
     /** @var array<string> */
@@ -52,14 +62,12 @@ class CloverParser
             'methods' => 0,
             'conditionals' => 0,
             'statements' => 0,
-            'elements' => 0,
         ];
 
         $this->coveredTotals = [
             'coveredmethods' => 0,
             'coveredconditionals' => 0,
             'coveredstatements' => 0,
-            'coveredelements' => 0,
         ];
 
         $this->hasCalculatedTotals = false;
@@ -76,13 +84,6 @@ class CloverParser
                     $this->incrementTotalsWithMetrics($project->metrics);
 
                     continue;
-                }
-
-                foreach ($project->xpath('//file') as $file) {
-                    // no other way of seeing if the element exists?
-                    if ($file->metrics->count() > 0) {
-                        $this->incrementTotalsWithMetrics($file->metrics);
-                    }
                 }
             }
         }
@@ -105,8 +106,6 @@ class CloverParser
         $this->coveredTotals['coveredconditionals'] += (int) $metrics['coveredconditionals'];
         $this->totals['statements'] += (int) $metrics['statements'];
         $this->coveredTotals['coveredstatements'] += (int) $metrics['coveredstatements'];
-        $this->totals['elements'] += (int) $metrics['elements'];
-        $this->coveredTotals['coveredelements'] += (int) $metrics['coveredelements'];
     }
 
     public function getPercentage(): float
