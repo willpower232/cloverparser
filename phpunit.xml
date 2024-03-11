@@ -9,4 +9,9 @@
       <directory suffix=".php">./src</directory>
     </include>
   </source>
+  <extensions>
+    <bootstrap class="RobinIngelbrecht\PHPUnitCoverageTools\PhpUnitExtension">
+      <parameter name="exitOnLowCoverage" value="1" />
+    </bootstrap>
+  </extensions>
 </phpunit>
